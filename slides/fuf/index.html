@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Présentation de FuzzyFinder</title>
+    <link rel="stylesheet" type="text/css" href="../../lib/QuickSlides/slidy.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <script src="../../lib/QuickSlides/showdown.js"></script>
+    <script src="../../lib/QuickSlides/slidy.js"></script>
+</head>
+<body>
+
+<script type=text/markdown>
+<!--
+# FuzzyFinder
+
+C'est un plugin Vim qui permet d'accéder rapidement à un fichier, un buffer en cours d'édition, etc.
+
+Il propose de très nombreuses commandes, dont la plupart n'ont évidemment d'intérêt qu'une fois affectée à une combinaison de touches.
+
+---
+
+# Alternatives
+
+* **FuzzyFinder** : Puissant mais le développement n'a plus l'air très actif — [http://www.vim.org/scripts/script.php?script_id=1984]()
+* ctrlp.vim : prometteur, le développement est actif [http://kien.github.com/ctrlp.vim/]()
+* Command-T : écrit en Ruby, ce qui le disqualifie à mes yeux (trop de dépendances) [https://wincent.com/products/command-t]()
+
+---
+
+# Installation
+
+FuzzyFinder utilise une bibliothèque de fonctions additionnelles pour Vim, [L9](http://www.vim.org/scripts/script.php?script_id=3252), qu'il faut également installer.
+
+Il fonctionne bien avec Pathogen, créer un dossier dans `.vim/bundle` suffit.
+
+---
+
+# Commandes de base (1)
+
+* `:FufFile` : cherche un fichier
+* `:FufDir` : cherche un dossier
+* `:FufBuffer` : pour accéder à l'un des buffers actuellement ouverts;
+
+---
+
+# Commandes de base (2)
+
+* `:FufJumpList` : pour se déplacer dans la liste des précédentes positions dans les fichiers;
+* `:FufChangeList` : pour se déplacer dans la liste des dernières modifications;
+* `:FufMruFile` : cherche parmi les derniers fichiers utilisés (désactivé par défaut à cause de potentiels soucis de performances);
+* `:FufMruCmd` : cherche parmi les dernières commandes utilisés (désactivé par défaut à cause de potentiels soucis de performances);
+
+---
+
+# Commandes de base (3)
+
+* `:FufQuickfix` : pour se déplacer dans la fenêtre QuickFix
+* `:FufHelp` : accéder à un sujet de l'aide de Vim
+* `:FufLine` : pour aller à une ligne du buffer en cours. #WTF;
+
+---
+
+# Ouvrir un fichier
+
+Une fois un item sélectionné dans la liste déroulante, on peut l'ouvrir de plusieurs manières :
+
+* `Entrée` : dans la fenêtre courante;
+* `<C-j>` : dans un split horizontal;
+* `<C-k>` : dans un split vertical;
+* `<C-l>` : dans un nouvel onglet;
+
+---
+
+# Recherche par contexte
+
+Permet de créer des contextes de recherche, par exemple uniquement les fichiers JavaScript
+
+* `:FufCoverageFileRegister` pour créer un contexte. On saisit successivement les motifs de recherche puis le nom du contexte;
+* `:FufCoverageFileChange` pour changer de contexte;
+* `:FufCoverageFile` pour rechercher un fichier dans le contexte courant;
+
+---
+
+# Étiquettes (tags)
+
+* `:FufTag` : utilise les fichiers de tags de Vim;
+* `:FufBufferTag` : cherche dans le buffer courant;
+* `:FufBufferTagAll` : cherche dans tous les buffers ouverts;
+* on peut ajouter `WithCursorWord` pour rechercher le mot sous le curseur, pe `:FufTagWithCursorWord`;
+* on peut ajouter `WithSelectedText` pour rechercher le texte sélectionné, pe `:FufBufferTagAllWithSelectedText`;
+* `:FufTaggedFile` : permet d'ouvrir un des fichiers dont les tags sont connus (ie dans les fichiers .ctags, etc);
+
+---
+
+# Marque-pages
+
+* `:FufBookmarkDirAdd` : ajoute un marque-page sur un dossier;
+* `:FufBookmarkDir` : cherche parmi les marque-dossiers;
+* `:FufBookmarkFileAdd` : ajoute un marque page sur un fichier;
+* `:FufBookmarkFile` : cherche…;
+
+---
+
+# Motifs de recherche
+
+FuzzyFinder a deux mode pour restreindre la liste des items proposés à partir de ce que vous tapez : flou (*fuzzy*) ou partiel. Au cours d'une recherche, vous pouvez passer de l'un à l'autre au moyen de `<C-\><C-\>` (probablement à *remapper* si vous l'utilisez). Dans le mode *flou* il affiche tous les items contenant les lettres que vous tapez. En mode partiel, uniquement ceux qui contiennent exactement cette sous-chaîne.
+
+Un motif de recherche est composé d'un motif principal éventuellement suivi d'autres motifs, séparés par un point-virgule, pour filtrer les résultats. Si des précisions sont présentes, FuzzyFinder bascule automatiquement en mode de recherche partielle.
+
+Par exemple `style;layout` cherchera les fichiers dont le path contient `style` et `layout`;
+
+
+---
+
+# API interne
+
+FuzzyFinder fournit également des fonctions pour créer ses propres commandes.
+
+On peut par exemple afficher tous les fichiers de sa racine commençant par un point :
+
+    nnoremap <silent> <leader>. :call fuf#givenfile#launch('', 0, '>', split(glob('~/.*'), "\n"))<CR>
+
+---
+
+# Example de configuration
+
+    nnoremap <silent> <leader>t :FufTag<CR>
+    nnoremap <silent> <leader>b :FufBuffer<CR>
+    nnoremap <silent> <leader>B :FufBookmarkFile<CR>
+    nnoremap <silent> <leader>l :FufLine<CR>
+    nnoremap <silent> <leader>r :FufFileWithCurrentBufferDir<CR>
+    nnoremap <silent> <leader>f :FufFile **/<CR>
+    nnoremap <silent> <leader>c :FufChangeList<CR>
+    nnoremap <silent> <leader>j :FufJumpList<CR>
+    nnoremap <silent> <leader>d :FufDir<CR>
+    nnoremap <silent> <leader>m :FufMruFile<CR>
+    let g:fuf_modesDisable = ['mrucmd'] " activer MruFile, désactiver MruCmd
+
+---
+
+# Crédits
+
+Présentation réalisée avec [QuickSlide](https://github.com/airportyh/QuickSlides) : [Showdown](https://github.com/coreyti/showdown) pour convertir le Markdown en HTML et [Slidy](http://www.w3.org/Talks/Tools/Slidy2/) pour l'afficher.
+
+-->
+</script>
+<script>
+  var ids=[];
+</script>
+<script src="../../lib/quickslide.js"></script>
+</body>
+</html>
