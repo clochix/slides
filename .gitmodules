@@ -1,0 +1,3 @@
+[submodule "lib/QuickSlides"]
+	path = lib/QuickSlides
+	url = https://github.com/airportyh/QuickSlides.git
